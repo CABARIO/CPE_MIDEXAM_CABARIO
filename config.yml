@@ -3,28 +3,31 @@
 - hosts: all
   become: true
   pre_tasks:
+    - name: update repository index (CentOS)
+      tags: always
+      dnf:
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "CentOS"
 
-  - name: update repository index (Centos)
-    tags: always
-    dnf:
-      update_cache: yes
-    changed_when: False
-    when: ansible_distribution == "Centos"
+    - name: update repository index (Ubuntu)
+      tags: always
+      apt:
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "Ubuntu"
 
-  - name: update repository index (Ubuntu)
-    tags: always
-    apt:
-      update_cache: yes
-    changed_when: False
-    when: ansible_distribution == "Ubuntu"
-
-- hosts: all
+- hosts: elasticsearch_kibana_logstash
   become: true
   roles:
-      - elasticsearch
-      - logstash
-      - grafana
-      - prometheus
-      - lampstack
-      - kibana
-      - influxdb
+    - elasticsearch_kibana_logstash
+
+- hosts: grafana_prometheus
+  become: true
+  roles:
+    - grafana_prometheus
+
+- hosts: lampstack
+  become: true
+  roles:
+    - lampstack
